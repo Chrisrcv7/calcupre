@@ -3,53 +3,598 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Costo de Servicios</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Calculadora de Servicios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            padding: 25px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .form-content {
+            padding: 25px 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .day-item {
+            position: relative;
+        }
+
+        .day-checkbox {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .day-label {
+            display: block;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .day-checkbox:checked + .day-label {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            border-color: #4facfe;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .time-input, .number-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .time-input:focus, .number-input:focus {
+            border-color: #4facfe;
+            background: white;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.1);
+        }
+
+        .price-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .price-input-wrapper {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .lock-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .lock-container:has(.lock-checkbox:checked) {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .lock-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: #ffc107;
+        }
+
+        .lock-label {
+            font-size: 0.85rem;
+            color: #666;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(238, 90, 36, 0.3);
+            margin-top: 10px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(238, 90, 36, 0.4);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            margin-top: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .results.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .results h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .floating-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 30px rgba(238, 90, 36, 0.3);
+            z-index: 1000;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Media Queries para diferentes tamaños de pantalla */
+        @media (max-width: 480px) {
+            .container {
+                margin: 5px;
+                border-radius: 15px;
+            }
+            
+            .form-content {
+                padding: 20px 15px;
+            }
+            
+            .days-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .price-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .price-input-wrapper {
+                min-width: auto;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 500px;
+            }
+            
+            .days-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Animaciones adicionales */
+        .form-group {
+            animation: fadeIn 0.6s ease-out forwards;
+            animation-delay: calc(var(--delay) * 0.1s);
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Estado de input deshabilitado */
+        .number-input:disabled {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border-color: #e9ecef;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
+    <div class="floating-icon">💰</div>
+    
     <div class="container">
-        <h1>Calculadora de Costo de Servicios</h1>
+        <div class="header">
+            <h1>Calculadora de Servicios</h1>
+            <p>Calcula tus costos de manera fácil y rápida</p>
+        </div>
 
-        <div class="form-group">
-            <label>Días de la Semana:</label>
-            <div class="days-selector">
-                <label><input type="checkbox" id="lunes" value="lunes"> Lunes</label>
-                <label><input type="checkbox" id="martes" value="martes"> Martes</label>
-                <label><input type="checkbox" id="miercoles" value="miercoles"> Miércoles</label>
-                <label><input type="checkbox" id="jueves" value="jueves"> Jueves</label>
-                <label><input type="checkbox" id="viernes" value="viernes"> Viernes</label>
+        <div class="form-content">
+            <div class="form-group" style="--delay: 1">
+                <label class="form-label">📅 Selecciona los días de trabajo</label>
+                <div class="days-grid">
+                    <div class="day-item">
+                        <input type="checkbox" id="lunes" value="lunes" class="day-checkbox">
+                        <label for="lunes" class="day-label">Lunes</label>
+                    </div>
+                    <div class="day-item">
+                        <input type="checkbox" id="martes" value="martes" class="day-checkbox">
+                        <label for="martes" class="day-label">Martes</label>
+                    </div>
+                    <div class="day-item">
+                        <input type="checkbox" id="miercoles" value="miercoles" class="day-checkbox">
+                        <label for="miercoles" class="day-label">Miércoles</label>
+                    </div>
+                    <div class="day-item">
+                        <input type="checkbox" id="jueves" value="jueves" class="day-checkbox">
+                        <label for="jueves" class="day-label">Jueves</label>
+                    </div>
+                    <div class="day-item">
+                        <input type="checkbox" id="viernes" value="viernes" class="day-checkbox">
+                        <label for="viernes" class="day-label">Viernes</label>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label for="horaEntrada">Hora de Entrada:</label>
-            <input type="time" id="horaEntrada" name="horaEntrada">
-        </div>
+            <div class="form-group" style="--delay: 2">
+                <label class="form-label" for="horaEntrada">🕐 Hora de Entrada</label>
+                <div class="input-group">
+                    <input type="time" id="horaEntrada" class="time-input">
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="horaSalida">Hora de Salida:</label>
-            <input type="time" id="horaSalida" name="horaSalida">
-        </div>
+            <div class="form-group" style="--delay: 3">
+                <label class="form-label" for="horaSalida">🕕 Hora de Salida</label>
+                <div class="input-group">
+                    <input type="time" id="horaSalida" class="time-input">
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="precioPorHora">Precio por Hora:</label>
-            <input type="number" id="precioPorHora" name="precioPorHora" value="0.625" step="0.001">
-            <label>
-                <input type="checkbox" id="bloquearPrecio"> Bloquear Precio
-            </label>
-        </div>
+            <div class="form-group" style="--delay: 4">
+                <label class="form-label">💲 Precio por Hora</label>
+                <div class="price-container">
+                    <div class="price-input-wrapper">
+                        <input type="number" id="precioPorHora" value="0.625" step="0.001" class="number-input">
+                    </div>
+                    <div class="lock-container">
+                        <input type="checkbox" id="bloquearPrecio" class="lock-checkbox">
+                        <label for="bloquearPrecio" class="lock-label">🔒 Fijar precio</label>
+                    </div>
+                </div>
+            </div>
 
-        <button id="calcularCosto">Calcular Costo</button>
+            <button id="calcularCosto" class="calculate-btn">
+                ✨ Calcular Costo
+            </button>
 
-        <div id="resultados" class="resultados">
-            <h2>Resultados</h2>
-            <p>Costo Diario: <span id="costoDiario"></span></p>
-            <p>Costo Semanal: <span id="costoSemanal"></span></p>
-            <p>Costo Mensual: <span id="costoMensual"></span></p>
-            <p>Horas en el dia: <span id="horasDia"></span></p>
+            <div id="resultados" class="results">
+                <h2>📊 Resultados</h2>
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div class="result-label">Costo Diario</div>
+                        <div class="result-value" id="costoDiario">$0.00</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Costo Semanal</div>
+                        <div class="result-value" id="costoSemanal">$0.00</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Costo Mensual</div>
+                        <div class="result-value" id="costoMensual">$0.00</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Horas al día</div>
+                        <div class="result-value" id="horasDia">0</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const horaEntradaInput = document.getElementById('horaEntrada');
+            const horaSalidaInput = document.getElementById('horaSalida');
+            const precioPorHoraInput = document.getElementById('precioPorHora');
+            const bloquearPrecioCheckbox = document.getElementById('bloquearPrecio');
+            const calcularCostoBtn = document.getElementById('calcularCosto');
+            const costoDiarioSpan = document.getElementById('costoDiario');
+            const costoSemanalSpan = document.getElementById('costoSemanal');
+            const costoMensualSpan = document.getElementById('costoMensual');
+            const horasDiaSpan = document.getElementById('horasDia');
+            const resultadosDiv = document.getElementById('resultados');
+            const diasSeleccionados = document.querySelectorAll('.day-checkbox');
+
+            // Inicializar animaciones de los form groups
+            const formGroups = document.querySelectorAll('.form-group');
+            formGroups.forEach((group, index) => {
+                group.style.setProperty('--delay', index + 1);
+            });
+
+            // Inicializar el estado del campo de precio por hora
+            precioPorHoraInput.disabled = bloquearPrecioCheckbox.checked;
+
+            // Escuchar el cambio en el checkbox de bloquear precio
+            bloquearPrecioCheckbox.addEventListener('change', function() {
+                precioPorHoraInput.disabled = this.checked;
+                
+                // Agregar efecto visual
+                if (this.checked) {
+                    precioPorHoraInput.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        precioPorHoraInput.style.transform = 'scale(1)';
+                    }, 200);
+                }
+            });
+
+            // Agregar efectos de hover a los días
+            diasSeleccionados.forEach(dia => {
+                dia.addEventListener('change', function() {
+                    const label = this.nextElementSibling;
+                    if (this.checked) {
+                        label.style.transform = 'translateY(-2px) scale(1.02)';
+                    } else {
+                        label.style.transform = 'translateY(0) scale(1)';
+                    }
+                });
+            });
+
+            calcularCostoBtn.addEventListener('click', function() {
+                const horaEntrada = horaEntradaInput.value;
+                const horaSalida = horaSalidaInput.value;
+                const precioPorHora = parseFloat(precioPorHoraInput.value);
+
+                if (!horaEntrada || !horaSalida) {
+                    mostrarAlerta('⚠️ Por favor, ingrese la hora de entrada y la hora de salida.');
+                    return;
+                }
+
+                if (isNaN(precioPorHora)) {
+                    mostrarAlerta('⚠️ Por favor, ingrese un precio por hora válido.');
+                    return;
+                }
+
+                const diferenciaHoras = calcularDiferenciaHoras(horaEntrada, horaSalida);
+                const costoDiario = diferenciaHoras * precioPorHora;
+
+                let diasSeleccionadosCount = 0;
+                diasSeleccionados.forEach(dia => {
+                    if (dia.checked) {
+                        diasSeleccionadosCount++;
+                    }
+                });
+
+                if (diasSeleccionadosCount === 0) {
+                    mostrarAlerta('⚠️ Por favor, seleccione al menos un día de la semana.');
+                    return;
+                }
+
+                const costoSemanal = costoDiario * diasSeleccionadosCount;
+                const costoMensual = costoSemanal * 4;
+
+                // Animación de cálculo
+                this.innerHTML = '🔄 Calculando...';
+                this.disabled = true;
+
+                setTimeout(() => {
+                    costoDiarioSpan.textContent = `$${costoDiario.toFixed(2)}`;
+                    costoSemanalSpan.textContent = `$${costoSemanal.toFixed(2)}`;
+                    costoMensualSpan.textContent = `$${costoMensual.toFixed(2)}`;
+                    horasDiaSpan.textContent = diferenciaHoras.toFixed(1);
+
+                    resultadosDiv.classList.add('show');
+                    this.innerHTML = '✨ Calcular Costo';
+                    this.disabled = false;
+
+                    // Scroll suave hacia los resultados
+                    resultadosDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 1000);
+            });
+
+            function calcularDiferenciaHoras(horaEntrada, horaSalida) {
+                const entrada = new Date(`01/01/2023 ${horaEntrada}`);
+                const salida = new Date(`01/01/2023 ${horaSalida}`);
+
+                let diferencia = (salida.getTime() - entrada.getTime()) / (1000 * 60 * 60);
+
+                if (diferencia < 0) {
+                    diferencia = 24 + diferencia;
+                }
+
+                return diferencia;
+            }
+
+            function mostrarAlerta(mensaje) {
+                // Crear alerta personalizada
+                const alertaDiv = document.createElement('div');
+                alertaDiv.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 15px;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+                    z-index: 10000;
+                    text-align: center;
+                    font-weight: 500;
+                    max-width: 90%;
+                    animation: alertaIn 0.3s ease-out;
+                `;
+                alertaDiv.innerHTML = mensaje;
+                
+                document.body.appendChild(alertaDiv);
+                
+                setTimeout(() => {
+                    alertaDiv.style.animation = 'alertaOut 0.3s ease-out forwards';
+                    setTimeout(() => {
+                        document.body.removeChild(alertaDiv);
+                    }, 300);
+                }, 2500);
+            }
+
+            // Agregar estilos de animación para la alerta
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes alertaIn {
+                    from {
+                        opacity: 0;
+                        transform: translate(-50%, -50%) scale(0.8);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translate(-50%, -50%) scale(1);
+                    }
+                }
+                
+                @keyframes alertaOut {
+                    from {
+                        opacity: 1;
+                        transform: translate(-50%, -50%) scale(1);
+                    }
+                    to {
+                        opacity: 0;
+                        transform: translate(-50%, -50%) scale(0.8);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
 </body>
 </html>
