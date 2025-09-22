@@ -400,6 +400,12 @@
                 ✨ Calcular Costo
             </button>
 
+            <div style="text-align:center; margin: 30px 0 10px 0;">
+                <button id="btnSalir" style="padding: 14px 32px; background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 6px 18px rgba(238,90,36,0.18); transition: background 0.3s;">
+                    🚪 Salir
+                </button>
+            </div>
+
             <div id="resultados" class="results">
                 <h2>📊 Resultados</h2>
                 <div class="result-grid">
@@ -437,6 +443,14 @@
             const horasDiaSpan = document.getElementById('horasDia');
             const resultadosDiv = document.getElementById('resultados');
             const diasSeleccionados = document.querySelectorAll('.day-checkbox');
+
+            // Botón Salir
+            const btnSalir = document.getElementById('btnSalir');
+            if (btnSalir) {
+                btnSalir.addEventListener('click', function() {
+                    window.close();
+                });
+            }
 
             // Inicializar animaciones de los form groups
             const formGroups = document.querySelectorAll('.form-group');
